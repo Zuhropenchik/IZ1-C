@@ -9,36 +9,37 @@ on:
 env:
   BUILD_TYPE: Release
 
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: build
-      run: cmake -B ./build
+      - name: install gtest
+        run: sudo apt install libgtest-dev lcov
+
+      - name: build
+        run: mkdir build && cd build && cmake .. && cmake --build .
 
   test:
     runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v2
-    
-    - name: install gtest
-      run: sudo apt install libgtest-dev lcov
-      
-    - name: build
-      run: cmake -Dtest=true -B ./build
-      
-    - name: make
-      run: cmake --build ./build
 
-    - name: run-tests
-      run: ./build/GoogleTest/test
-      
-    - name: get-stats
-      run: lcov -t "tests" -o coverage.info -c -d . && genhtml -o report coverage.info
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install gtest
+        run: sudo apt install libgtest-dev lcov
+
+      - name: build
+        run:  mkdir build && cd build && cmake .. && cmake --build . && ./tests/tests
+
+      - name: get-stats
+        run: lcov -t "GoogleTest" -o coverage.info -c -d .
+
+      - name: genhtml
+        run: genhtml -o report coverage.info
 
 
 
